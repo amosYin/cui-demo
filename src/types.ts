@@ -2,6 +2,7 @@
 export type Unit = 'CNY' | '10K' | '100M';
 
 export interface GlobalFilters {
+  product: string;
   dateRange: [string, string];
   benchmark: string;
   unit: Unit;

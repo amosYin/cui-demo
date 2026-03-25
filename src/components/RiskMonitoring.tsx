@@ -7,8 +7,6 @@ import { mockRiskIndicators } from '../mockData';
 const { Title, Text } = Typography;
 
 const RiskMonitoring: React.FC = () => {
-  const [stressParams, setStressParams] = useState({ interestRate: 50, stockPrice: -10 });
-
   // Leverage Chart Option
   const getLeverageOption = () => ({
     tooltip: { trigger: 'axis' },
@@ -19,6 +17,7 @@ const RiskMonitoring: React.FC = () => {
         name: '历史杠杆率',
         type: 'line',
         data: [120, 125, 128, 125.4],
+        itemStyle: { color: '#023D7F' },
         markLine: { data: [{ yAxis: 140, name: '预警线', lineStyle: { color: '#ff4d4f' } }] }
       }
     ]
@@ -34,7 +33,7 @@ const RiskMonitoring: React.FC = () => {
         min: 0,
         max: 10,
         splitNumber: 5,
-        itemStyle: { color: '#1890ff' },
+        itemStyle: { color: '#023D7F' },
         progress: { show: true, width: 18 },
         pointer: { show: false },
         axisLine: { lineStyle: { width: 18 } },
@@ -64,7 +63,7 @@ const RiskMonitoring: React.FC = () => {
     { title: '类型', dataIndex: 'type', key: 'type', render: (val: string) => <Tag color={val === '股票' ? 'blue' : 'green'}>{val}</Tag> },
     { title: '占比(%)', dataIndex: 'percentage', key: 'percentage', render: (val: number) => (
       <Space>
-        <Progress percent={val} size="small" showInfo={false} style={{ width: 100 }} />
+        <Progress percent={val} size="small" showInfo={false} style={{ width: 100 }} strokeColor="#023D7F" />
         <Text strong>{val.toFixed(2)}%</Text>
       </Space>
     )}
@@ -91,7 +90,7 @@ const RiskMonitoring: React.FC = () => {
             <ReactECharts option={getDurationOption()} style={{ height: 350 }} />
             <div className="text-center">
               <Space>
-                <Badge status="processing" text="修正久期: 3.12年" />
+                <Badge status="processing" text="修正久期: 3.12年" color="#023D7F" />
                 <Badge status="processing" text="基准久期: 3.50年" />
                 <Badge status="warning" text="久期偏离: -0.38年" />
               </Space>
@@ -101,44 +100,9 @@ const RiskMonitoring: React.FC = () => {
       </Row>
 
       <Row gutter={[16, 16]}>
-        <Col span={16}>
+        <Col span={24}>
           <Card title="前五大集中度监控" bordered={false}>
-            <Table columns={concentrationColumns} dataSource={concentrationData} pagination={false} size="small" />
-          </Card>
-        </Col>
-        <Col span={8}>
-          <Card title="压力测试 (模拟计算)" bordered={false}>
-            <div className="space-y-4">
-              <div>
-                <Text type="secondary">利率变动 (BP)</Text>
-                <InputNumber 
-                  className="w-full mt-1" 
-                  value={stressParams.interestRate} 
-                  onChange={(val) => setStressParams(prev => ({ ...prev, interestRate: val || 0 }))} 
-                />
-              </div>
-              <div>
-                <Text type="secondary">股票变动 (%)</Text>
-                <InputNumber 
-                  className="w-full mt-1" 
-                  value={stressParams.stockPrice} 
-                  onChange={(val) => setStressParams(prev => ({ ...prev, stockPrice: val || 0 }))} 
-                />
-              </div>
-              <div className="pt-4 border-t">
-                <div className="flex justify-between mb-2">
-                  <Text>预估净值影响</Text>
-                  <Text strong type={(stressParams.interestRate * -0.003 + stressParams.stockPrice * 0.45) >= 0 ? 'danger' : 'success'}>
-                    {(stressParams.interestRate * -0.003 + stressParams.stockPrice * 0.45).toFixed(2)}%
-                  </Text>
-                </div>
-                <div className="flex justify-between">
-                  <Text>预估净值</Text>
-                  <Text strong>{(1.1245 * (1 + (stressParams.interestRate * -0.003 + stressParams.stockPrice * 0.45) / 100)).toFixed(4)}</Text>
-                </div>
-              </div>
-              <Alert message="压力测试结果仅供参考，不构成投资建议。" type="info" showIcon />
-            </div>
+            <Table columns={concentrationColumns} dataSource={concentrationData} pagination={false} size="middle" />
           </Card>
         </Col>
       </Row>
@@ -151,11 +115,11 @@ const RiskMonitoring: React.FC = () => {
             xAxis: { type: 'category', data: ['2025-12', '2026-01', '2026-02', '2026-03'] },
             yAxis: { type: 'value', name: '市值(万元)' },
             series: [
-              { name: 'AAA', type: 'bar', stack: 'total', data: [1200, 1300, 1400, 1500] },
-              { name: 'AA+', type: 'bar', stack: 'total', data: [700, 750, 780, 800] },
-              { name: 'AA', type: 'bar', stack: 'total', data: [300, 350, 380, 400] },
-              { name: 'A-1', type: 'bar', stack: 'total', data: [150, 180, 190, 200] },
-              { name: '无评级', type: 'bar', stack: 'total', data: [80, 90, 95, 100] }
+              { name: 'AAA', type: 'bar', stack: 'total', data: [1200, 1300, 1400, 1500], itemStyle: { color: '#023D7F' } },
+              { name: 'AA+', type: 'bar', stack: 'total', data: [700, 750, 780, 800], itemStyle: { color: '#1890ff' } },
+              { name: 'AA', type: 'bar', stack: 'total', data: [300, 350, 380, 400], itemStyle: { color: '#52c41a' } },
+              { name: 'A-1', type: 'bar', stack: 'total', data: [150, 180, 190, 200], itemStyle: { color: '#faad14' } },
+              { name: '无评级', type: 'bar', stack: 'total', data: [80, 90, 95, 100], itemStyle: { color: '#bfbfbf' } }
             ]
           }} 
           style={{ height: 400 }} 

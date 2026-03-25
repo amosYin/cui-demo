@@ -45,6 +45,7 @@ export const useFilters = () => {
 
 export default function App() {
   const [filters, setFilters] = useState<GlobalFilters>({
+    product: '测试资管产品A',
     dateRange: [dayjs().subtract(3, 'month').format('YYYY-MM-DD'), dayjs().format('YYYY-MM-DD')],
     benchmark: '沪深300',
     unit: 'CNY',
@@ -54,7 +55,7 @@ export default function App() {
   const [currentPath, setCurrentPath] = useState(window.location.hash.replace('#', '') || 'dashboard');
 
   const menuItems = [
-    { key: 'dashboard', icon: <DashboardOutlined />, label: '仪表盘' },
+    { key: 'dashboard', icon: <DashboardOutlined />, label: '整体分析' },
     { key: 'allocation', icon: <PieChartOutlined />, label: '资产配置' },
     { key: 'attribution', icon: <BarChartOutlined />, label: '业绩归因' },
     { key: 'risk', icon: <SafetyCertificateOutlined />, label: '风险监控' },
@@ -67,7 +68,15 @@ export default function App() {
   };
 
   return (
-    <ConfigProvider locale={zhCN}>
+    <ConfigProvider 
+      locale={zhCN}
+      theme={{
+        token: {
+          colorPrimary: '#023D7F',
+          borderRadius: 4,
+        },
+      }}
+    >
       <FilterContext.Provider value={{ filters, setFilters }}>
         <Router>
           <Layout style={{ minHeight: '100vh' }}>
@@ -84,11 +93,12 @@ export default function App() {
                 top: 0,
                 bottom: 0,
                 zIndex: 100,
+                backgroundColor: '#023D7F'
               }}
             >
               <div style={{ height: 64, margin: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Title level={4} style={{ color: 'white', margin: 0, whiteSpace: 'nowrap' }}>
-                  {collapsed ? 'FMS' : '资产配置系统'}
+                  {collapsed ? 'FMS' : '资管分析系统'}
                 </Title>
               </div>
               <Menu 
@@ -97,6 +107,7 @@ export default function App() {
                 mode="inline" 
                 items={menuItems}
                 onClick={handleMenuClick}
+                style={{ backgroundColor: '#023D7F' }}
               />
             </Sider>
             <Layout style={{ marginLeft: collapsed ? 80 : 200, transition: 'all 0.2s' }}>
@@ -109,34 +120,57 @@ export default function App() {
                 position: 'sticky',
                 top: 0,
                 zIndex: 99,
-                boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
+                boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                height: 'auto',
+                minHeight: 64,
+                paddingTop: 8,
+                paddingBottom: 8
               }}>
-                <Space size="large">
+                <Space size="large" wrap>
                   <Space>
-                    <FilterOutlined />
+                    <FilterOutlined style={{ color: '#023D7F' }} />
                     <Text strong>全局筛选</Text>
                   </Space>
-                  <RangePicker 
-                    defaultValue={[dayjs(filters.dateRange[0]), dayjs(filters.dateRange[1])]}
-                    onChange={(dates) => {
-                      if (dates && dates[0] && dates[1]) {
-                        setFilters(prev => ({
-                          ...prev,
-                          dateRange: [dates[0]!.format('YYYY-MM-DD'), dates[1]!.format('YYYY-MM-DD')]
-                        }));
-                      }
-                    }}
-                  />
-                  <Select 
-                    defaultValue={filters.benchmark}
-                    style={{ width: 120 }}
-                    onChange={(val) => setFilters(prev => ({ ...prev, benchmark: val }))}
-                    options={[
-                      { value: '沪深300', label: '沪深300' },
-                      { value: '中证500', label: '中证500' },
-                      { value: '中债综合', label: '中债综合' },
-                    ]}
-                  />
+                  <Space>
+                    <Text type="secondary">选择产品：</Text>
+                    <Select 
+                      defaultValue={filters.product}
+                      style={{ width: 160 }}
+                      onChange={(val) => setFilters(prev => ({ ...prev, product: val }))}
+                      options={[
+                        { value: '测试资管产品A', label: '测试资管产品A' },
+                        { value: '测试资管产品B', label: '测试资管产品B' },
+                      ]}
+                    />
+                  </Space>
+                  <Space>
+                    <Text type="secondary">时间范围：</Text>
+                    <RangePicker 
+                      defaultValue={[dayjs(filters.dateRange[0]), dayjs(filters.dateRange[1])]}
+                      onChange={(dates) => {
+                        if (dates && dates[0] && dates[1]) {
+                          setFilters(prev => ({
+                            ...prev,
+                            dateRange: [dates[0]!.format('YYYY-MM-DD'), dates[1]!.format('YYYY-MM-DD')]
+                          }));
+                        }
+                      }}
+                    />
+                  </Space>
+                  <Space>
+                    <Text type="secondary">业绩基准：</Text>
+                    <Select 
+                      defaultValue={filters.benchmark}
+                      style={{ width: 150 }}
+                      onChange={(val) => setFilters(prev => ({ ...prev, benchmark: val }))}
+                      options={[
+                        { value: '沪深300', label: '沪深300' },
+                        { value: '中证800', label: '中证800' },
+                        { value: '中债综合指数', label: '中债综合指数' },
+                        { value: '中证500', label: '中证500' },
+                      ]}
+                    />
+                  </Space>
                   <Radio.Group 
                     value={filters.unit} 
                     onChange={(e) => setFilters(prev => ({ ...prev, unit: e.target.value }))}

@@ -75,31 +75,41 @@ const Dashboard: React.FC = () => {
     ]
   });
 
-  // Performance Attribution Bar Option
+  // Performance Attribution Bar Option (Contribution Percentages)
   const getAttributionOption = () => ({
-    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-    legend: { data: ['资产配置效应', '选券效应', '交互效应'] },
+    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, formatter: '{b}<br/>{a0}: {c0}%<br/>{a1}: {c1}%<br/>{a2}: {c2}%' },
+    legend: { data: ['股票贡献', '债券贡献', '基金贡献', '现金贡献'] },
     grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
-    xAxis: { type: 'category', data: mockPerformanceAttribution.map(d => d.category) },
+    xAxis: { type: 'category', data: ['本月累计'] },
     yAxis: { type: 'value', axisLabel: { formatter: '{value}%' } },
     series: [
       {
-        name: '资产配置效应',
+        name: '股票贡献',
         type: 'bar',
         stack: 'total',
-        data: mockPerformanceAttribution.map(d => d.allocationEffect)
+        data: [1.75],
+        itemStyle: { color: '#023D7F' }
       },
       {
-        name: '选券效应',
+        name: '债券贡献',
         type: 'bar',
         stack: 'total',
-        data: mockPerformanceAttribution.map(d => d.selectionEffect)
+        data: [0.45],
+        itemStyle: { color: '#1890ff' }
       },
       {
-        name: '交互效应',
+        name: '基金贡献',
         type: 'bar',
         stack: 'total',
-        data: mockPerformanceAttribution.map(d => d.interactionEffect)
+        data: [0.42],
+        itemStyle: { color: '#52c41a' }
+      },
+      {
+        name: '现金贡献',
+        type: 'bar',
+        stack: 'total',
+        data: [0.05],
+        itemStyle: { color: '#faad14' }
       }
     ]
   });
@@ -114,14 +124,14 @@ const Dashboard: React.FC = () => {
               title="单位净值"
               value={1.1245}
               precision={4}
-              valueStyle={{ color: '#1890ff' }}
+              valueStyle={{ color: '#023D7F' }}
             />
           </Card>
         </Col>
         <Col span={6}>
           <Card bordered={false} hoverable>
             <Statistic
-              title="当日收益率"
+              title="日收益"
               value={0.85}
               precision={2}
               valueStyle={{ color: '#cf1322' }}
@@ -173,7 +183,7 @@ const Dashboard: React.FC = () => {
       {/* Charts Row 2 */}
       <Row gutter={[16, 16]}>
         <Col span={12}>
-          <Card title="业绩归因摘要 (本月)" bordered={false}>
+          <Card title="业绩归因摘要 (收益贡献)" bordered={false}>
             <ReactECharts option={getAttributionOption()} style={{ height: 350 }} />
           </Card>
         </Col>
@@ -184,14 +194,14 @@ const Dashboard: React.FC = () => {
                 <div key={indicator.name}>
                   <div className="flex justify-between mb-2">
                     <Text strong>{indicator.name}</Text>
-                    <Text type={indicator.value > indicator.threshold ? 'danger' : 'secondary'}>
-                      {indicator.value}{indicator.unit} / 阈值 {indicator.threshold}{indicator.unit}
+                    <Text strong color="#023D7F">
+                      {indicator.value}{indicator.unit}
                     </Text>
                   </div>
                   <Progress 
                     percent={(indicator.value / indicator.threshold) * 100} 
-                    status={indicator.value > indicator.threshold ? 'exception' : 'active'}
-                    strokeColor={indicator.value > indicator.threshold ? '#ff4d4f' : '#1890ff'}
+                    showInfo={false}
+                    strokeColor={indicator.value > indicator.threshold ? '#ff4d4f' : '#023D7F'}
                   />
                 </div>
               ))}
