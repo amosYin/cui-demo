@@ -93,13 +93,13 @@ const RiskMonitoring: React.FC = () => {
     <div className="space-y-6">
       <Row gutter={[16, 16]}>
         <Col span={12}>
-          <Card title={renderTitle("杠杆率监控", "Leverage Monitoring", "监控组合的总杠杆率水平，并与监管/内部预警线进行对比。")} bordered={false} style={{ height: '100%' }}>
+          <Card title={renderTitle("杠杆率监控", "Leverage Monitoring", "监控组合的总杠杆率水平，并与监管/内部预警线进行对比。")} variant="borderless" style={{ height: '100%' }}>
             <ReactECharts option={getLeverageOption()} style={{ height: 350 }} />
             <div style={{ height: 22 }}></div> {/* Spacer to match badges height */}
           </Card>
         </Col>
         <Col span={12}>
-          <Card title={renderTitle("组合久期监控", "Portfolio Duration Monitoring", "展示组合的修正久期，并对比基准久期，评估利率风险敏感度。")} bordered={false} style={{ height: '100%' }}>
+          <Card title={renderTitle("组合久期监控", "Portfolio Duration Monitoring", "展示组合的修正久期，并对比基准久期，评估利率风险敏感度。")} variant="borderless" style={{ height: '100%' }}>
             <ReactECharts option={getDurationOption()} style={{ height: 350 }} />
             <div className="text-center">
               <Space>
@@ -114,13 +114,13 @@ const RiskMonitoring: React.FC = () => {
 
       <Row gutter={[16, 16]}>
         <Col span={24}>
-          <Card title={renderTitle("前五大集中度监控", "Top 5 Concentration Monitoring", "监控前五大持仓的合计占比，防范个券集中度风险。")} bordered={false}>
+          <Card title={renderTitle("前五大集中度监控", "Top 5 Concentration Monitoring", "监控前五大持仓的合计占比，防范个券集中度风险。")} variant="borderless">
             <Table columns={concentrationColumns} dataSource={concentrationData} pagination={false} size="middle" />
           </Card>
         </Col>
       </Row>
 
-      <Card title={renderTitle("信用风险分布", "Credit Risk Distribution", "展示债券组合在不同信用评级下的市值分布及历史变化。")} bordered={false}>
+      <Card title={renderTitle("信用风险分布", "Credit Risk Distribution", "展示债券组合在不同信用评级下的市值分布及历史变化。")} variant="borderless">
         <ReactECharts 
           option={{
             tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },

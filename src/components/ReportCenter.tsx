@@ -19,7 +19,7 @@ const ReportCenter: React.FC = () => {
     <div className="space-y-6">
       <Row gutter={[16, 16]}>
         <Col span={24}>
-          <Card title="报告模板" bordered={false}>
+          <Card title="报告模板" variant="borderless">
             <Row gutter={[16, 16]}>
               {['日报', '周报', '月报', '季报'].map(type => (
                 <Col span={6} key={type}>
@@ -42,7 +42,7 @@ const ReportCenter: React.FC = () => {
         <Col span={24}>
           <Card 
             title="历史报告记录" 
-            bordered={false}
+            variant="borderless"
             extra={<Button type="link">查看更多</Button>}
           >
             <List

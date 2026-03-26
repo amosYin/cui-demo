@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, createContext, useContext } from 'react';
+import React, { useState, createContext, useContext, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ConfigProvider, Layout, Menu, Select, DatePicker, Radio, Space, Typography, Card, Row, Col } from 'antd';
 import { 
@@ -12,7 +12,8 @@ import {
   PieChartOutlined, 
   BarChartOutlined, 
   SafetyCertificateOutlined, 
-  FileTextOutlined
+  FileTextOutlined,
+  DatabaseOutlined
 } from '@ant-design/icons';
 import { Button, Tooltip as AntTooltip } from 'antd';
 import dayjs from 'dayjs';
@@ -24,6 +25,7 @@ import AssetAllocation from './components/AssetAllocation';
 import PerformanceAttribution from './components/PerformanceAttribution';
 import RiskMonitoring from './components/RiskMonitoring';
 import ReportCenter from './components/ReportCenter';
+import ValuationMaintenance from './components/ValuationMaintenance';
 import { Unit, GlobalFilters } from './types';
 
 const { Header, Sider, Content } = Layout;
@@ -46,27 +48,58 @@ export const useFilters = () => {
 
 export default function App() {
   const [filters, setFilters] = useState<GlobalFilters>({
-    product: '测试资管产品A',
+    product: '安联测试产品1',
     dateRange: [dayjs().subtract(3, 'month').format('YYYY-MM-DD'), dayjs().format('YYYY-MM-DD')],
     benchmark: '沪深300',
     unit: 'CNY',
   });
 
   const [collapsed, setCollapsed] = useState(false);
-  const [currentPath, setCurrentPath] = useState(window.location.hash.replace('#', '') || 'dashboard');
+  const [currentPath, setCurrentPath] = useState(window.location.hash.replace('#', '') || 'valuation');
+
+  useEffect(() => {
+    // Trigger window resize event when sidebar collapses/expands
+    // to allow charts to resize correctly
+    const timer = setTimeout(() => {
+      window.dispatchEvent(new Event('resize'));
+    }, 250); // Slightly more than the CSS transition time
+    return () => clearTimeout(timer);
+  }, [collapsed]);
 
   const menuItems = [
-    { key: 'dashboard', icon: <DashboardOutlined />, label: '整体分析' },
-    { key: 'allocation', icon: <PieChartOutlined />, label: '资产配置' },
-    { key: 'attribution', icon: <BarChartOutlined />, label: '业绩归因' },
-    { key: 'risk', icon: <SafetyCertificateOutlined />, label: '风险监控' },
-    { key: 'reports', icon: <FileTextOutlined />, label: '报告中心' },
+    { key: 'valuation', icon: <DatabaseOutlined />, label: '估值表维护' },
+    { 
+      key: 'analysis', 
+      icon: <DashboardOutlined />, 
+      label: '投后分析',
+      children: [
+        { key: 'dashboard', label: '整体分析' },
+        { key: 'allocation', label: '资产配置' },
+        { key: 'attribution', label: '业绩归因' },
+        { key: 'risk', label: '风险监控' },
+        { key: 'reports', label: '报告中心' },
+      ]
+    },
   ];
 
   const handleMenuClick = (e: any) => {
     window.location.hash = e.key;
     setCurrentPath(e.key);
   };
+
+  const getPageTitle = () => {
+    switch (currentPath) {
+      case 'valuation': return '估值表维护';
+      case 'dashboard': return '整体分析';
+      case 'allocation': return '资产配置';
+      case 'attribution': return '业绩归因';
+      case 'risk': return '风险监控';
+      case 'reports': return '报告中心';
+      default: return '投后分析';
+    }
+  };
+
+  const isAnalysisPage = ['dashboard', 'allocation', 'attribution', 'risk', 'reports'].includes(currentPath);
 
   return (
     <ConfigProvider 
@@ -92,6 +125,8 @@ export default function App() {
               collapsible 
               collapsed={collapsed} 
               onCollapse={(value) => setCollapsed(value)}
+              breakpoint="lg"
+              collapsedWidth="80"
               theme="dark"
               style={{
                 overflow: 'auto',
@@ -101,96 +136,105 @@ export default function App() {
                 top: 0,
                 bottom: 0,
                 zIndex: 100,
-                backgroundColor: '#023D7F'
+                backgroundColor: '#023D7F',
+                boxShadow: '2px 0 8px rgba(0,0,0,0.15)'
               }}
             >
               <div style={{ height: 64, margin: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Title level={4} style={{ color: 'white', margin: 0, whiteSpace: 'nowrap' }}>
-                  {collapsed ? 'FMS' : '资管分析系统'}
+                <Title level={4} style={{ color: 'white', margin: 0, whiteSpace: 'nowrap', fontSize: collapsed ? '16px' : '18px' }}>
+                  {collapsed ? 'AL' : '安联投后分析工具'}
                 </Title>
               </div>
               <Menu 
                 theme="dark" 
-                defaultSelectedKeys={[currentPath]} 
+                selectedKeys={[currentPath]} 
                 mode="inline" 
                 items={menuItems}
                 onClick={handleMenuClick}
                 style={{ backgroundColor: '#023D7F' }}
               />
             </Sider>
-            <Layout style={{ marginLeft: collapsed ? 80 : 200, transition: 'all 0.2s' }}>
-              <Header style={{ 
-                padding: '0 24px', 
-                background: '#fff', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'space-between',
-                position: 'sticky',
-                top: 0,
-                zIndex: 99,
-                boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                height: 'auto',
-                minHeight: 64,
-                paddingTop: 8,
-                paddingBottom: 8
+              <Layout style={{ 
+                marginLeft: collapsed ? 80 : 200, 
+                width: `calc(100% - ${collapsed ? 80 : 200}px)`,
+                transition: 'all 0.2s cubic-bezier(0.2, 0, 0, 1)',
+                minWidth: 0,
+                overflowX: 'hidden'
               }}>
-                <Space size="large" wrap>
+                <Header style={{ 
+                  padding: '0 24px', 
+                  background: '#fff', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'space-between',
+                  position: 'sticky',
+                  top: 0,
+                  zIndex: 99,
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                  height: 'auto',
+                  minHeight: 64,
+                  paddingTop: 8,
+                  paddingBottom: 8,
+                  width: '100%',
+                  overflowX: 'auto'
+                }}>
+                <div className="flex items-center space-x-4">
                   <Space>
-                    <FilterOutlined style={{ color: '#023D7F' }} />
-                    <Text strong>全局筛选</Text>
+                    {currentPath === 'valuation' ? <DatabaseOutlined style={{ color: '#023D7F', fontSize: '18px' }} /> : <DashboardOutlined style={{ color: '#023D7F', fontSize: '18px' }} />}
+                    <Title level={5} style={{ margin: 0 }}>{getPageTitle()}</Title>
                   </Space>
-                  <Space>
-                    <Text type="secondary">选择产品：</Text>
-                    <Select 
-                      defaultValue={filters.product}
-                      style={{ width: 160 }}
-                      onChange={(val) => setFilters(prev => ({ ...prev, product: val }))}
-                      options={[
-                        { value: '测试资管产品A', label: '测试资管产品A' },
-                        { value: '测试资管产品B', label: '测试资管产品B' },
-                      ]}
-                    />
-                  </Space>
-                  <Space>
-                    <Text type="secondary">时间范围：</Text>
-                    <RangePicker 
-                      defaultValue={[dayjs(filters.dateRange[0]), dayjs(filters.dateRange[1])]}
-                      onChange={(dates) => {
-                        if (dates && dates[0] && dates[1]) {
-                          setFilters(prev => ({
-                            ...prev,
-                            dateRange: [dates[0]!.format('YYYY-MM-DD'), dates[1]!.format('YYYY-MM-DD')]
-                          }));
-                        }
-                      }}
-                    />
-                  </Space>
-                  <Space>
-                    <Text type="secondary">业绩基准：</Text>
-                    <Select 
-                      defaultValue={filters.benchmark}
-                      style={{ width: 150 }}
-                      onChange={(val) => setFilters(prev => ({ ...prev, benchmark: val }))}
-                      options={[
-                        { value: '沪深300', label: '沪深300' },
-                        { value: '中证800', label: '中证800' },
-                        { value: '中债综合指数', label: '中债综合指数' },
-                        { value: '中证500', label: '中证500' },
-                      ]}
-                    />
-                  </Space>
-                  <Radio.Group 
-                    value={filters.unit} 
-                    onChange={(e) => setFilters(prev => ({ ...prev, unit: e.target.value }))}
-                    buttonStyle="solid"
-                  >
-                    <Radio.Button value="CNY">元</Radio.Button>
-                    <Radio.Button value="10K">万元</Radio.Button>
-                    <Radio.Button value="100M">亿元</Radio.Button>
-                  </Radio.Group>
-                </Space>
+                  
+                  {isAnalysisPage && (
+                    <div className="ml-8 flex items-center space-x-6 border-l pl-8 border-gray-200">
+                      <Space>
+                        <FilterOutlined style={{ color: '#023D7F' }} />
+                        <Text strong>全局筛选</Text>
+                      </Space>
+                      <Space>
+                        <Text type="secondary">产品：</Text>
+                        <Select 
+                          defaultValue={filters.product}
+                          style={{ width: 140 }}
+                          onChange={(val) => setFilters(prev => ({ ...prev, product: val }))}
+                          options={[
+                            { value: '安联测试产品1', label: '安联测试产品1' },
+                            { value: '测试资管产品B', label: '测试资管产品B' },
+                          ]}
+                          size="small"
+                        />
+                      </Space>
+                      <Space>
+                        <Text type="secondary">时间：</Text>
+                        <RangePicker 
+                          defaultValue={[dayjs(filters.dateRange[0]), dayjs(filters.dateRange[1])]}
+                          onChange={(dates) => {
+                            if (dates && dates[0] && dates[1]) {
+                              setFilters(prev => ({
+                                ...prev,
+                                dateRange: [dates[0]!.format('YYYY-MM-DD'), dates[1]!.format('YYYY-MM-DD')]
+                              }));
+                            }
+                          }}
+                          size="small"
+                          style={{ width: 220 }}
+                        />
+                      </Space>
+                      <Radio.Group 
+                        value={filters.unit} 
+                        onChange={(e) => setFilters(prev => ({ ...prev, unit: e.target.value }))}
+                        buttonStyle="solid"
+                        size="small"
+                      >
+                        <Radio.Button value="CNY">元</Radio.Button>
+                        <Radio.Button value="10K">万元</Radio.Button>
+                        <Radio.Button value="100M">亿元</Radio.Button>
+                      </Radio.Group>
+                    </div>
+                  )}
+                </div>
+                
                 <Space>
-                  <Text type="secondary">最后更新：{dayjs().format('YYYY-MM-DD HH:mm')}</Text>
+                  <Text type="secondary" style={{ fontSize: '12px' }}>更新：{dayjs().format('MM-DD HH:mm')}</Text>
                 </Space>
               </Header>
               <Content style={{ 
@@ -203,6 +247,7 @@ export default function App() {
                   padding: 0,
                   background: 'transparent'
                 }}>
+                  {currentPath === 'valuation' && <ValuationMaintenance />}
                   {currentPath === 'dashboard' && <Dashboard />}
                   {currentPath === 'allocation' && <AssetAllocation />}
                   {currentPath === 'attribution' && <PerformanceAttribution />}

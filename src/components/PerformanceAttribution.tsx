@@ -82,10 +82,10 @@ const PerformanceAttribution: React.FC = () => {
       label: '大类资产归因',
       children: (
         <div className="space-y-6">
-          <Card title={renderTitle("大类资产超额收益分解", "Asset Class Excess Return Decomposition", "将组合超额收益分解为资产配置效应、选券效应和交互效应。")} bordered={false}>
+          <Card title={renderTitle("大类资产超额收益分解", "Asset Class Excess Return Decomposition", "将组合超额收益分解为资产配置效应、选券效应和交互效应。")} variant="borderless">
             <ReactECharts option={getMajorAttributionOption()} style={{ height: 400 }} />
           </Card>
-          <Card title={renderTitle("归因明细表", "Attribution Details Table", "提供各大类资产归因分析的详细数值，包括权重偏离和各效应贡献。")} bordered={false}>
+          <Card title={renderTitle("归因明细表", "Attribution Details Table", "提供各大类资产归因分析的详细数值，包括权重偏离和各效应贡献。")} variant="borderless">
             <Table columns={attributionColumns} dataSource={attributionData} pagination={false} />
           </Card>
         </div>
@@ -96,10 +96,10 @@ const PerformanceAttribution: React.FC = () => {
       label: '股票行业归因',
       children: (
         <div className="space-y-6">
-          <Card title={renderTitle("行业配置 vs 行业选股", "Industry Allocation vs Selection", "通过气泡图展示各行业的配置效应与选股效应，气泡大小代表行业权重。")} bordered={false}>
+          <Card title={renderTitle("行业配置 vs 行业选股", "Industry Allocation vs Selection", "通过气泡图展示各行业的配置效应与选股效应，气泡大小代表行业权重。")} variant="borderless">
             <ReactECharts option={getStockBubbleOption()} style={{ height: 450 }} />
           </Card>
-          <Card title={renderTitle("行业归因明细", "Industry Attribution Details", "提供各行业归因分析的详细贡献数据。")} bordered={false}>
+          <Card title={renderTitle("行业归因明细", "Industry Attribution Details", "提供各行业归因分析的详细贡献数据。")} variant="borderless">
             <Table 
               columns={[
                 { title: '行业名称', dataIndex: 'industry', key: 'industry' },
@@ -123,7 +123,7 @@ const PerformanceAttribution: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <Card bordered={false}>
+      <Card variant="borderless">
         <Tabs defaultActiveKey="1" items={items} />
       </Card>
     </div>
