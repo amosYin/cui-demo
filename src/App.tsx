@@ -7,13 +7,14 @@ import React, { useState, createContext, useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ConfigProvider, Layout, Menu, Select, DatePicker, Radio, Space, Typography, Card, Row, Col } from 'antd';
 import { 
+  FilterOutlined,
   DashboardOutlined, 
   PieChartOutlined, 
   BarChartOutlined, 
   SafetyCertificateOutlined, 
-  FileTextOutlined,
-  FilterOutlined
+  FileTextOutlined
 } from '@ant-design/icons';
+import { Button, Tooltip as AntTooltip } from 'antd';
 import dayjs from 'dayjs';
 import zhCN from 'antd/locale/zh_CN';
 import 'dayjs/locale/zh-cn';
@@ -73,13 +74,20 @@ export default function App() {
       theme={{
         token: {
           colorPrimary: '#023D7F',
-          borderRadius: 4,
+          borderRadius: 8,
+          colorBgContainer: '#fff',
+          colorBgLayout: '#f0f2f5',
         },
+        components: {
+          Card: {
+            boxShadowTertiary: '0 4px 12px rgba(0,0,0,0.05)',
+          }
+        }
       }}
     >
       <FilterContext.Provider value={{ filters, setFilters }}>
         <Router>
-          <Layout style={{ minHeight: '100vh' }}>
+          <Layout className="optimized-theme" style={{ minHeight: '100vh' }}>
             <Sider 
               collapsible 
               collapsed={collapsed} 
@@ -185,12 +193,22 @@ export default function App() {
                   <Text type="secondary">最后更新：{dayjs().format('YYYY-MM-DD HH:mm')}</Text>
                 </Space>
               </Header>
-              <Content style={{ margin: '24px 16px', padding: 24, background: '#f0f2f5', minHeight: 280 }}>
-                {currentPath === 'dashboard' && <Dashboard />}
-                {currentPath === 'allocation' && <AssetAllocation />}
-                {currentPath === 'attribution' && <PerformanceAttribution />}
-                {currentPath === 'risk' && <RiskMonitoring />}
-                {currentPath === 'reports' && <ReportCenter />}
+              <Content style={{ 
+                margin: '24px', 
+                padding: 0, 
+                background: 'transparent', 
+                minHeight: 280 
+              }}>
+                <div style={{ 
+                  padding: 0,
+                  background: 'transparent'
+                }}>
+                  {currentPath === 'dashboard' && <Dashboard />}
+                  {currentPath === 'allocation' && <AssetAllocation />}
+                  {currentPath === 'attribution' && <PerformanceAttribution />}
+                  {currentPath === 'risk' && <RiskMonitoring />}
+                  {currentPath === 'reports' && <ReportCenter />}
+                </div>
               </Content>
             </Layout>
           </Layout>

@@ -24,7 +24,7 @@ const ReportCenter: React.FC = () => {
               {['日报', '周报', '月报', '季报'].map(type => (
                 <Col span={6} key={type}>
                   <Card hoverable className="text-center py-6 border-dashed border-2">
-                    <FilePdfOutlined style={{ fontSize: 48, color: '#1890ff', marginBottom: 16 }} />
+                    <FilePdfOutlined style={{ fontSize: 48, color: '#023D7F', marginBottom: 16 }} />
                     <Title level={5}>{type}模板</Title>
                     <Text type="secondary">包含净值、配置、归因、风险</Text>
                     <div className="mt-4">
@@ -57,11 +57,11 @@ const ReportCenter: React.FC = () => {
                   ]}
                 >
                   <List.Item.Meta
-                    avatar={<FilePdfOutlined style={{ fontSize: 32, color: '#ff4d4f' }} />}
+                    avatar={<FilePdfOutlined style={{ fontSize: 32, color: '#D50000' }} />}
                     title={<Text strong>{item.title}</Text>}
                     description={
                       <Space>
-                        <Tag color="blue">{item.type}</Tag>
+                        <Tag color="#023D7F">{item.type}</Tag>
                         <Text type="secondary">生成时间：{item.date} 09:00</Text>
                       </Space>
                     }

@@ -1,17 +1,28 @@
 
 import React from 'react';
-import { Row, Col, Card, Table, Typography, Space, Tabs, Tag } from 'antd';
+import { Row, Col, Card, Table, Typography, Space, Tabs, Tag, Tooltip } from 'antd';
+import { QuestionCircleOutlined } from '@ant-design/icons';
 import ReactECharts from 'echarts-for-react';
 import { mockAssetAllocation, mockBondTypes, mockStockIndustry } from '../mockData';
 
 const { Title, Text } = Typography;
 
 const AssetAllocation: React.FC = () => {
+  const renderTitle = (title: string, subTitle: string, description: string) => (
+    <Space size={4}>
+      <span>{title}</span>
+      <Text type="secondary" style={{ fontSize: '12px', fontWeight: 'normal', marginLeft: 4 }}>{subTitle}</Text>
+      <Tooltip title={description}>
+        <QuestionCircleOutlined style={{ color: '#bfbfbf', fontSize: '14px', cursor: 'help' }} />
+      </Tooltip>
+    </Space>
+  );
   // Major Asset Allocation Area Chart Option
   const getMajorAllocationOption = () => ({
     tooltip: { trigger: 'axis', axisPointer: { type: 'cross', label: { backgroundColor: '#6a7985' } } },
-    legend: { data: ['现金', '股票', '债券', '基金'] },
-    grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+    legend: { data: ['现金', '股票', '债券', '基金'], top: 0 },
+    color: ['#00BFA5', '#023D7F', '#0066CC', '#4DA1FF'],
+    grid: { left: '3%', right: '4%', bottom: '10%', top: '15%', containLabel: true },
     xAxis: { type: 'category', boundaryGap: false, data: ['2025-12', '2026-01', '2026-02', '2026-03'] },
     yAxis: { type: 'value', axisLabel: { formatter: '{value}%' } },
     series: [
@@ -25,25 +36,27 @@ const AssetAllocation: React.FC = () => {
   // Stock Industry Distribution Option
   const getStockIndustryOption = () => ({
     tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-    legend: { data: ['组合权重', '基准权重'] },
-    grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+    legend: { data: ['组合权重', '基准权重'], top: 0 },
+    grid: { left: '3%', right: '4%', bottom: '5%', top: '15%', containLabel: true },
     xAxis: { type: 'value', axisLabel: { formatter: '{value}%' } },
     yAxis: { type: 'category', data: mockStockIndustry.map(d => d.industry) },
     series: [
-      { name: '组合权重', type: 'bar', data: mockStockIndustry.map(d => d.weight) },
-      { name: '基准权重', type: 'bar', data: mockStockIndustry.map(d => d.benchmarkWeight) }
+      { name: '组合权重', type: 'bar', data: mockStockIndustry.map(d => d.weight), itemStyle: { color: '#023D7F' } },
+      { name: '基准权重', type: 'bar', data: mockStockIndustry.map(d => d.benchmarkWeight), itemStyle: { color: '#B0BEC5' } }
     ]
   });
 
   // Bond Type Distribution Option
   const getBondTypeOption = () => ({
     tooltip: { trigger: 'item' },
-    legend: { orient: 'vertical', left: 'left' },
+    legend: { orient: 'horizontal', top: '0', left: 'center' },
     series: [
       {
         name: '债券品种',
         type: 'pie',
         radius: '50%',
+        center: ['50%', '55%'],
+        color: ['#023D7F', '#0066CC', '#4DA1FF', '#00BFA5', '#FFB300', '#7E57C2'],
         data: mockBondTypes.map(item => ({ value: item.value, name: item.type })),
         emphasis: { itemStyle: { shadowBlur: 10, shadowOffsetX: 0, shadowColor: 'rgba(0, 0, 0, 0.5)' } }
       }
@@ -56,7 +69,7 @@ const AssetAllocation: React.FC = () => {
     { title: '持仓市值(元)', dataIndex: 'value', key: 'value', render: (val: number) => val.toLocaleString() },
     { title: '权重(%)', dataIndex: 'weight', key: 'weight', render: (val: number) => val.toFixed(2) },
     { title: '当日贡献(%)', dataIndex: 'contribution', key: 'contribution', render: (val: number) => (
-      <Text type={val >= 0 ? 'danger' : 'success'}>{val > 0 ? '+' : ''}{val.toFixed(2)}%</Text>
+      <Text style={{ color: val >= 0 ? '#D50000' : '#00BFA5' }}>{val > 0 ? '+' : ''}{val.toFixed(2)}%</Text>
     )}
   ];
 
@@ -75,7 +88,7 @@ const AssetAllocation: React.FC = () => {
       children: (
         <Row gutter={[16, 16]}>
           <Col span={24}>
-            <Card title="历史资产配置比例变化" bordered={false}>
+            <Card title={renderTitle("历史资产配置比例变化", "Historical Asset Allocation Changes", "展示组合大类资产配置比例的历史演变过程。")} bordered={false}>
               <ReactECharts option={getMajorAllocationOption()} style={{ height: 450 }} />
             </Card>
           </Col>
@@ -88,12 +101,12 @@ const AssetAllocation: React.FC = () => {
       children: (
         <Row gutter={[16, 16]}>
           <Col span={12}>
-            <Card title="行业分布 (组合 vs 基准)" bordered={false}>
+            <Card title={renderTitle("行业分布 (组合 vs 基准)", "Industry Distribution", "对比组合与基准在各行业的配置权重，识别行业偏离情况。")} bordered={false}>
               <ReactECharts option={getStockIndustryOption()} style={{ height: 400 }} />
             </Card>
           </Col>
           <Col span={12}>
-            <Card title="前十大重仓股" bordered={false}>
+            <Card title={renderTitle("前十大重仓股", "Top 10 Holdings", "展示组合中权重最高的前十只股票及其基本信息。")} bordered={false}>
               <Table columns={stockColumns} dataSource={stockData} pagination={false} size="small" />
             </Card>
           </Col>
@@ -106,18 +119,20 @@ const AssetAllocation: React.FC = () => {
       children: (
         <Row gutter={[16, 16]}>
           <Col span={12}>
-            <Card title="债券品种分布" bordered={false}>
+            <Card title={renderTitle("债券品种分布", "Bond Type Distribution", "展示债券资产在国债、金融债、信用债等不同品种上的分布。")} bordered={false}>
               <ReactECharts option={getBondTypeOption()} style={{ height: 400 }} />
             </Card>
           </Col>
           <Col span={12}>
-            <Card title="信用评级分布" bordered={false}>
+            <Card title={renderTitle("信用评级分布", "Credit Rating Distribution", "展示组合中债券资产的信用评级分布情况，评估信用风险敞口。")} bordered={false}>
               <ReactECharts 
                 option={{
                   tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+                  legend: { data: ['市值(万元)'], top: 0 },
+                  grid: { left: '3%', right: '4%', bottom: '5%', top: '15%', containLabel: true },
                   xAxis: { type: 'category', data: ['AAA', 'AA+', 'AA', 'A-1', '无评级'] },
                   yAxis: { type: 'value', name: '市值(万元)' },
-                  series: [{ type: 'bar', data: [1500, 800, 400, 200, 100], itemStyle: { color: '#1890ff' } }]
+                  series: [{ name: '市值(万元)', type: 'bar', data: [1500, 800, 400, 200, 100], itemStyle: { color: '#023D7F' } }]
                 }} 
                 style={{ height: 400 }} 
               />
