@@ -31,12 +31,8 @@ const ValuationMaintenance: React.FC = () => {
   const columns = [
     { title: '估值日期', dataIndex: 'date', key: 'date' },
     { title: '产品/策略名称', dataIndex: 'productName', key: 'productName' },
-    { title: '科目代码', dataIndex: 'subjectCode', key: 'subjectCode' },
-    { title: '科目名称', dataIndex: 'subjectName', key: 'subjectName' },
-    { title: '数量', dataIndex: 'quantity', key: 'quantity', render: (val: number) => val.toLocaleString() },
-    { title: '单位成本', dataIndex: 'unitCost', key: 'unitCost', render: () => '-' },
-    { title: '成本', dataIndex: 'cost', key: 'cost', render: () => '-' },
-    { title: '市值', dataIndex: 'marketValue', key: 'marketValue', render: () => '-' },
+    { title: '单位净值', dataIndex: 'unitNetValue', key: 'unitNetValue', render: (val: number) => val?.toFixed(4) || '-' },
+    { title: '市值(元)', dataIndex: 'marketValue', key: 'marketValue', render: (val: number) => val?.toLocaleString() || '-' },
   ];
 
   const mockData = [
@@ -44,17 +40,15 @@ const ValuationMaintenance: React.FC = () => {
       key: '1',
       date: '2025-02-21',
       productName: '中银证券中国红-汇农鑫享1号',
-      subjectCode: 'Z700123',
-      subjectName: '股票',
-      quantity: 7001,
+      unitNetValue: 1.1245,
+      marketValue: 12540000,
     },
     {
       key: '2',
       date: '2025-02-21',
       productName: '中银证券中国红-汇农鑫享1号',
-      subjectCode: 'Z700123',
-      subjectName: '股票',
-      quantity: 7001,
+      unitNetValue: 1.1248,
+      marketValue: 12560000,
     }
   ];
 

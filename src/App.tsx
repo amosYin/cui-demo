@@ -20,11 +20,8 @@ import dayjs from 'dayjs';
 import zhCN from 'antd/locale/zh_CN';
 import 'dayjs/locale/zh-cn';
 
-import Dashboard from './components/Dashboard';
 import AssetAllocation from './components/AssetAllocation';
 import PerformanceAttribution from './components/PerformanceAttribution';
-import RiskMonitoring from './components/RiskMonitoring';
-import ReportCenter from './components/ReportCenter';
 import ValuationMaintenance from './components/ValuationMaintenance';
 import { Unit, GlobalFilters } from './types';
 
@@ -73,11 +70,8 @@ export default function App() {
       icon: <DashboardOutlined />, 
       label: '投后分析',
       children: [
-        { key: 'dashboard', label: '整体分析' },
-        { key: 'allocation', label: '资产配置' },
         { key: 'attribution', label: '业绩归因' },
-        { key: 'risk', label: '风险监控' },
-        { key: 'reports', label: '报告中心' },
+        { key: 'allocation', label: '资产配置' },
       ]
     },
   ];
@@ -90,16 +84,13 @@ export default function App() {
   const getPageTitle = () => {
     switch (currentPath) {
       case 'valuation': return '估值表维护';
-      case 'dashboard': return '整体分析';
-      case 'allocation': return '资产配置';
       case 'attribution': return '业绩归因';
-      case 'risk': return '风险监控';
-      case 'reports': return '报告中心';
+      case 'allocation': return '资产配置';
       default: return '投后分析';
     }
   };
 
-  const isAnalysisPage = ['dashboard', 'allocation', 'attribution', 'risk', 'reports'].includes(currentPath);
+  const isAnalysisPage = ['allocation', 'attribution'].includes(currentPath);
 
   return (
     <ConfigProvider 
@@ -125,9 +116,8 @@ export default function App() {
               collapsible 
               collapsed={collapsed} 
               onCollapse={(value) => setCollapsed(value)}
-              breakpoint="lg"
               collapsedWidth="80"
-              theme="dark"
+              theme="light"
               style={{
                 overflow: 'auto',
                 height: '100vh',
@@ -136,22 +126,23 @@ export default function App() {
                 top: 0,
                 bottom: 0,
                 zIndex: 100,
-                backgroundColor: '#023D7F',
-                boxShadow: '2px 0 8px rgba(0,0,0,0.15)'
+                backgroundColor: '#fff',
+                borderRight: '1px solid #f0f0f0',
+                boxShadow: '2px 0 8px rgba(0,0,0,0.02)'
               }}
             >
-              <div style={{ height: 64, margin: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Title level={4} style={{ color: 'white', margin: 0, whiteSpace: 'nowrap', fontSize: collapsed ? '16px' : '18px' }}>
+              <div style={{ height: 64, margin: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', borderBottom: '1px solid #f0f2f5' }}>
+                <Title level={4} style={{ color: '#023D7F', margin: 0, whiteSpace: 'nowrap', fontSize: collapsed ? '16px' : '18px' }}>
                   {collapsed ? 'AL' : '安联投后分析工具'}
                 </Title>
               </div>
               <Menu 
-                theme="dark" 
+                theme="light" 
                 selectedKeys={[currentPath]} 
                 mode="inline" 
                 items={menuItems}
                 onClick={handleMenuClick}
-                style={{ backgroundColor: '#023D7F' }}
+                style={{ borderRight: 0 }}
               />
             </Sider>
               <Layout style={{ 
@@ -248,11 +239,8 @@ export default function App() {
                   background: 'transparent'
                 }}>
                   {currentPath === 'valuation' && <ValuationMaintenance />}
-                  {currentPath === 'dashboard' && <Dashboard />}
-                  {currentPath === 'allocation' && <AssetAllocation />}
                   {currentPath === 'attribution' && <PerformanceAttribution />}
-                  {currentPath === 'risk' && <RiskMonitoring />}
-                  {currentPath === 'reports' && <ReportCenter />}
+                  {currentPath === 'allocation' && <AssetAllocation />}
                 </div>
               </Content>
             </Layout>

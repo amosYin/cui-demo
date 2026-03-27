@@ -8,10 +8,9 @@ import { mockAssetAllocation, mockBondTypes, mockStockIndustry } from '../mockDa
 const { Title, Text } = Typography;
 
 const AssetAllocation: React.FC = () => {
-  const renderTitle = (title: string, subTitle: string, description: string) => (
+  const renderTitle = (title: string, description: string) => (
     <Space size={4}>
       <span>{title}</span>
-      <Text type="secondary" style={{ fontSize: '12px', fontWeight: 'normal', marginLeft: 4 }}>{subTitle}</Text>
       <Tooltip title={description}>
         <QuestionCircleOutlined style={{ color: '#bfbfbf', fontSize: '14px', cursor: 'help' }} />
       </Tooltip>
@@ -46,22 +45,91 @@ const AssetAllocation: React.FC = () => {
     ]
   });
 
-  // Bond Type Distribution Option
-  const getBondTypeOption = () => ({
-    tooltip: { trigger: 'item' },
-    legend: { orient: 'horizontal', top: '0', left: 'center' },
-    series: [
-      {
-        name: '债券品种',
-        type: 'pie',
-        radius: '50%',
-        center: ['50%', '55%'],
-        color: ['#023D7F', '#0066CC', '#4DA1FF', '#00BFA5', '#FFB300', '#7E57C2'],
-        data: mockBondTypes.map(item => ({ value: item.value, name: item.type })),
-        emphasis: { itemStyle: { shadowBlur: 10, shadowOffsetX: 0, shadowColor: 'rgba(0, 0, 0, 0.5)' } }
-      }
-    ]
-  });
+  // Bond Type Distribution Option (Stacked Bar Chart + Line Chart as per user image)
+  const getBondTypeOption = () => {
+    const categories = [
+      '政策性金融债', '商金债', '中期票据', '国债', '可转债', '企业债', 
+      '资产支持证券', '银行存款和结算备付金', '企业短期融资券', '央行票据', 
+      '地方政府债', '中小企业私募债券', '其他债券', '买入返售金融资产', 
+      '货币市场工具', '同业存单'
+    ];
+    const quarters = ['2021Q1', '2021Q2', '2021Q3', '2021Q4', '2022Q1', '2022Q2', '2022Q3', '2022Q4', '2023Q1', '2023Q2', '2023Q3', '2023Q4', '2024Q1', '2024Q2', '2024Q3', '2024Q4', '2025Q1', '2025Q2', '2025Q3', '2025Q4'];
+    
+    // Colors extracted from the user provided image
+    const colors = [
+      '#E6B652', '#74529E', '#3C6291', '#5A9BD5', '#4E6A94', '#C0504D', 
+      '#9BBB59', '#8064A2', '#C0504D', '#4BACC6', '#F79646', '#92D050', 
+      '#0070C0', '#C00000', '#FFC000', '#7030A0'
+    ];
+
+    const series: any[] = categories.map((cat, index) => ({
+      name: cat,
+      type: 'bar',
+      stack: 'total',
+      emphasis: { focus: 'series' },
+      data: quarters.map(() => (Math.random() * 10 + 5).toFixed(2)),
+      itemStyle: { color: colors[index % colors.length] },
+      barWidth: '40%'
+    }));
+
+    // Add the line series as seen in the first image
+    series.push({
+      name: '加权平均平底溢价率(右)',
+      type: 'line',
+      yAxisIndex: 1,
+      data: quarters.map(() => (Math.random() * 40 + 60).toFixed(2)),
+      itemStyle: { color: '#FF5A5A' },
+      lineStyle: { width: 2 },
+      symbol: 'circle',
+      symbolSize: 6,
+      emphasis: { focus: 'series' }
+    });
+
+    return {
+      tooltip: { 
+        trigger: 'axis', 
+        axisPointer: { type: 'shadow' },
+        formatter: (params: any) => {
+          let res = params[0].name + '<br/>';
+          params.forEach((item: any) => {
+            res += item.marker + item.seriesName + ': ' + item.value + (item.seriesType === 'bar' ? '%' : '') + '<br/>';
+          });
+          return res;
+        }
+      },
+      legend: { 
+        data: [...categories, '加权平均平底溢价率(右)'], 
+        top: 0, 
+        type: 'scroll',
+        itemWidth: 12,
+        itemHeight: 12,
+        textStyle: { fontSize: 10 }
+      },
+      grid: { left: '3%', right: '4%', bottom: '10%', top: '15%', containLabel: true },
+      xAxis: { 
+        type: 'category', 
+        data: quarters,
+        axisLabel: { fontSize: 10 },
+        axisTick: { alignWithLabel: true }
+      },
+      yAxis: [
+        { 
+          type: 'value', 
+          name: '占比',
+          max: 140,
+          axisLabel: { formatter: '{value}%', fontSize: 10 },
+          splitLine: { lineStyle: { type: 'dashed' } }
+        },
+        {
+          type: 'value',
+          name: '溢价率',
+          axisLabel: { fontSize: 10 },
+          splitLine: { show: false }
+        }
+      ],
+      series: series
+    };
+  };
 
   const stockColumns = [
     { title: '股票名称', dataIndex: 'name', key: 'name' },
@@ -84,43 +152,24 @@ const AssetAllocation: React.FC = () => {
   const items = [
     {
       key: '1',
-      label: '大类资产配置',
+      label: '资产配置',
       children: (
-        <Row gutter={[16, 16]}>
-          <Col span={24}>
-            <Card title={renderTitle("历史资产配置比例变化", "Historical Asset Allocation Changes", "展示组合大类资产配置比例的历史演变过程。")} variant="borderless">
-              <ReactECharts option={getMajorAllocationOption()} style={{ height: 450 }} />
-            </Card>
-          </Col>
-        </Row>
-      ),
-    },
-    {
-      key: '3',
-      label: '债券细分配置',
-      children: (
-        <Row gutter={[16, 16]}>
-          <Col span={12}>
-            <Card title={renderTitle("债券品种分布", "Bond Type Distribution", "展示债券资产在国债、金融债、信用债等不同品种上的分布。")} variant="borderless">
-              <ReactECharts option={getBondTypeOption()} style={{ height: 400 }} />
-            </Card>
-          </Col>
-          <Col span={12}>
-            <Card title={renderTitle("信用评级分布", "Credit Rating Distribution", "展示组合中债券资产的信用评级分布情况，评估信用风险敞口。")} variant="borderless">
-              <ReactECharts 
-                option={{
-                  tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-                  legend: { data: ['市值(万元)'], top: 0 },
-                  grid: { left: '3%', right: '4%', bottom: '5%', top: '15%', containLabel: true },
-                  xAxis: { type: 'category', data: ['AAA', 'AA+', 'AA', 'A-1', '无评级'] },
-                  yAxis: { type: 'value', name: '市值(万元)' },
-                  series: [{ name: '市值(万元)', type: 'bar', data: [1500, 800, 400, 200, 100], itemStyle: { color: '#023D7F' } }]
-                }} 
-                style={{ height: 400 }} 
-              />
-            </Card>
-          </Col>
-        </Row>
+        <div className="space-y-6">
+          <Row gutter={[16, 16]}>
+            <Col span={24}>
+              <Card title={renderTitle("历史资产配置比例变化", "展示组合大类资产配置比例的历史演变过程。")} variant="borderless">
+                <ReactECharts option={getMajorAllocationOption()} style={{ height: 450 }} />
+              </Card>
+            </Col>
+          </Row>
+          <Row gutter={[16, 16]}>
+            <Col span={24}>
+              <Card title={renderTitle("债券品种分布", "展示债券资产在国债、金融债、信用债等不同品种上的分布。")} variant="borderless">
+                <ReactECharts option={getBondTypeOption()} style={{ height: 500 }} />
+              </Card>
+            </Col>
+          </Row>
+        </div>
       ),
     },
   ];
